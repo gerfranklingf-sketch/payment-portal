@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pay an invoice | Meridian Supply Co.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f6f8;
+      --surface: #fff;
+      --ink: #16202e;
+      --muted: #5d6b7c;
+      --line: #d9e0e7;
+      --brand: #0b5d66;
+      --brand-ink: #fff;
+      --err: #b3261e;
+      --ok: #1d7a4a;
+      --tint: #e5f1f2;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#0f1620; --surface:#18222f; --ink:#e8edf2; --muted:#9aa8b8; --line:#2b3949; --brand:#4cc3cf; --brand-ink:#08202a; --err:#ff8a80; --ok:#6fd49b; --tint:#16313a; }
+    }
+    *, *::before, *::after { box-sizing: inherit; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif; }
+    header { display:flex; justify-content:space-between; align-items:center; max-width:980px; margin:0 auto; padding:20px 20px 0; }
+    .logo { font-weight:700; font-size:1.15rem; letter-spacing:-.01em; }
+    .logo span { color:var(--brand); }
+    .secure,.hint { color:var(--muted); font-size:.85rem; }
+    main { max-width:980px; margin:0 auto; padding:28px 20px 56px; }
+    h1 { font-size:clamp(1.8rem,4vw,2.6rem); line-height:1.1; letter-spacing:-.02em; margin:0 0 6px; }
+    h2 { font-size:1.05rem; margin:0 0 16px; }
+    .sub { color:var(--muted); margin:0 0 28px; max-width:56ch; }
+    .grid { display:grid; grid-template-columns:5fr 6fr; gap:24px; align-items:start; }
+    @media (max-width:760px) { .grid { grid-template-columns:1fr; } }
+    .panel { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:24px; }
+    label { display:block; font-weight:500; font-size:.9rem; margin:14px 0 6px; }
+    input { width:100%; font:inherit; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:11px 12px; }
+    input:focus-visible,button:focus-visible { outline:2px solid var(--brand); outline-offset:2px; }
+    .lookup { display:flex; gap:8px; }
+    .lookup input { flex:1; min-width:0; }
+    button { font:inherit; font-weight:600; border:0; border-radius:6px; padding:11px 18px; cursor:pointer; background:var(--brand); color:var(--brand-ink); }
+    button.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); }
+    button.pay { width:100%; margin-top:20px; padding:14px; font-size:1.05rem; }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    .hint { margin-top:8px; }
+    .err { color:var(--err); font-size:.85rem; margin-top:6px; min-height:1.2em; }
+    dl { margin:0; }
+    .line { display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); }
+    .line dt { color:var(--muted); }
+    .line dd { margin:0; text-align:right; font-variant-numeric:tabular-nums; }
+    .total { display:flex; justify-content:space-between; align-items:baseline; padding-top:16px; }
+    .total strong { font-size:2rem; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+    .empty { color:var(--muted); padding:12px 0; }
+    .badge { display:inline-block; font-size:.8rem; font-weight:600; padding:2px 10px; border-radius:99px; background:var(--tint); color:var(--brand); }
+    .badge.paid { color:var(--ok); }
+    .demo { margin-top:24px; font-size:.85rem; color:var(--muted); border-top:1px solid var(--line); padding-top:14px; }
+    .receipt { text-align:center; padding:12px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Meridian<span> Supply Co.</span></div>
+    <div class="secure">M-Pesa sandbox checkout</div>
+  </header>
+  <main>
+    <h1>Pay an invoice</h1>
+    <p class="sub">Enter your invoice number, check the amount in Kenyan shillings, and approve the M-Pesa prompt on your phone.</p>
+    <div class="grid">
+      <section class="panel" aria-labelledby="inv-h">
+        <h2 id="inv-h">Your invoice</h2>
+        <div class="lookup">
+          <input id="invNo" placeholder="Invoice number, e.g. INV-1042" aria-label="Invoice number" autocomplete="off">
+          <button id="find" class="ghost" type="button">Find invoice</button>
+        </div>
+        <div class="err" id="invErr" role="alert"></div>
+        <div id="invoice"><p class="empty">Your invoice details will appear here.</p></div>
+      </section>
+      <section class="panel" aria-labelledby="pay-h">
+        <h2 id="pay-h">M-Pesa payment</h2>
+        <label for="phone">Kenyan M-Pesa number</label>
+        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="e.g. 0712 345 678">
+        <p class="hint">We will send an STK Push to this phone. Approve it with your M-Pesa PIN.</p>
+        <div class="err" id="payErr" role="alert"></div>
+        <button class="pay" id="payBtn" type="button" disabled>Send M-Pesa prompt</button>
+        <div id="paymentStatus" class="hint" role="status" aria-live="polite"></div>
+      </section>
+    </div>
+    <p class="demo">Sandbox only: no live M-Pesa charges are made. Try INV-1042 or INV-1043. Payment status is held in memory and resets when the server restarts.</p>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
